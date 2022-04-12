@@ -19,7 +19,7 @@ const int drinkPin2 = 6;
 const int alicePin = 7;
 
 const int cookieLED = 8; 
-const int drinkLED = 9;
+const int drink1LED = 9;
 const int aliceLED = 10;
 
 
@@ -40,28 +40,33 @@ void setup() {
   pinMode(drinkPin1, INPUT);
   pinMode(cookiePin, INPUT);
   pinMode(drinkPin2, INPUT);
+  pinMode(alicePin, INPUT);
 
   pinMode(cookieLED, OUTPUT);
-  pinMode(drinkLED, OUTPUT);
+  pinMode(drink1LED, OUTPUT);
   pinMode(aliceLED, OUTPUT);
   
   aliceServo.write(0);
+  digitalWrite(drink1LED, HIGH);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
   /*
+   * 
     1ST DRINK SWITCH
     - the servo is at 0 degrees because nothing has been used yet
     - once the drink is set down, the cookie LED lights up to signify that's the next step
-  */
+    *
+    */
   
   if(digitalRead(drinkPin1) == HIGH) {
 
     // servo turns 45 degrees
     aliceServo.write(45);
     // cookie LED lights up to signify next step
+    digitalWrite(drink1LED, LOW);
     digitalWrite(cookieLED, HIGH);
     
     
@@ -87,9 +92,14 @@ void loop() {
 
  if(digitalRead(cookiePin) == HIGH) {
     
+    // alice turns to the 90 degree angle
     aliceServo.write(90);
+    //
     digitalWrite(drinkLED, HIGH);
+    
+    // other LEDs turn off to signify that it's not time to use them
     digitalWrite(cookieLED, LOW);
+    digitalWrite(aliceLED, LOW);
 
     } 
     
@@ -112,8 +122,12 @@ void loop() {
   if(digitalRead(drinkPin2) == HIGH) {
     
     aliceServo.write(180);
+     digitalWrite(aliceLED, HIGH);
+
+    // other LEDs turn off to signify that it's not time to use them
     digitalWrite(drinkLED, LOW);
-    digitalWrite(aliceLED, HIGH);
+    digitalWrite(cookieLED, LOW);
+   
     
     } 
     
@@ -136,6 +150,9 @@ void loop() {
   if(digitalRead(alicePin) == HIGH) {
     
     doorServo.write(180);
+
+    
+    // other LEDs turn off to signify they don't need to be used anymore
     digitalWrite(drinkLED, LOW);
     digitalWrite(cookieLED, LOW);
     digitalWrite(aliceLED, LOW);
