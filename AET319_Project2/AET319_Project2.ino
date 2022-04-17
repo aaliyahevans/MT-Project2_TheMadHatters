@@ -7,160 +7,137 @@ Description: Button and servo program
 */
 
 // adding servo code library
-#include<Servo.h>;
+#include<Servo.h>
 
 // VARIABLES
-Servo aliceServo;
 Servo doorServo;
+Servo aliceServo;
+int drinkValue_1;
+int drinkValue_2;
+int aliceValue;
+int cookieValue;
 
-const int cookiePin = 4;
-const int drinkPin1 = 5;
-const int drinkPin2 = 6;
-const int alicePin = 7;
+
+
+// CONSTANTS
+const int cookieSWITCH = 4;
+const int drinkSWITCH_1 = 5;
+const int drinkSWITCH_2 = 6;
+const int aliceSWITCH = 7;
+const int doorPin = 11;
+const int alicePin = 12;
+
 
 const int cookieLED = 8; 
-const int drink1LED = 9;
+const int drinkLED = 9;
 const int aliceLED = 10;
-
-
-
 
 
 void setup() {
   // put your setup code here, to run once:
 
    /*
-    START!
-    - setting up pins, LEDs, and making sure they're noted as being either inputs or outputs
+    START
     - the servo must rotate to 0 degrees if it isn't already as its default angle is 90
-
+    - once the drink is set down, the cookie LED lights up to signify that's the next step
   */
   
-  aliceServo.attach(9);
-  pinMode(drinkPin1, INPUT);
-  pinMode(cookiePin, INPUT);
-  pinMode(drinkPin2, INPUT);
-  pinMode(alicePin, INPUT);
+  aliceServo.attach(alicePin);
+  aliceServo.write(0);
+  doorServo.attach(doorPin);
+  doorServo.write(0);
+  
+  pinMode(drinkSWITCH_1, INPUT);
+  pinMode(drinkSWITCH_2, INPUT);
+  pinMode(cookieSWITCH, INPUT);
+  pinMode(aliceSWITCH, INPUT);
 
+  pinMode(drinkLED, OUTPUT);
   pinMode(cookieLED, OUTPUT);
-  pinMode(drink1LED, OUTPUT);
   pinMode(aliceLED, OUTPUT);
   
-  aliceServo.write(0);
-  digitalWrite(drink1LED, HIGH);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
+
+  drinkValue_1 = digitalRead(drinkSWITCH_1);
+  drinkValue_2 = digitalRead(drinkSWITCH_2);
+  aliceValue = digitalRead(aliceSWITCH);
+  cookieValue = digitalRead(cookieSWITCH);
+
+ 
+ 
   /*
-   * 
     1ST DRINK SWITCH
     - the servo is at 0 degrees because nothing has been used yet
     - once the drink is set down, the cookie LED lights up to signify that's the next step
-    *
-    */
+  */
   
-  if(digitalRead(drinkPin1) == HIGH) {
+  if (drinkValue_1 == HIGH) {
 
-    // servo turns 45 degrees
-    aliceServo.write(45);
-    // cookie LED lights up to signify next step
-    digitalWrite(drink1LED, LOW);
-    digitalWrite(cookieLED, HIGH);
-    
-    
-    } 
-    
-    else {
-      
-      aliceServo.write(0);
-    
-    }
-  
-
-  
-  /*
-    
+   /*
+   
     COOKIE SWITCH
     - after the drink switch is used once, the LED for the cookie is lit up to signify that it's time to use it
     - because the drink switch was already used, the servo is at 45 degrees since it's already turned once
-    - when the cookie is placed down, the switch turns the servo another 45 degrees to get to 90
+    - when the cookie is placed down, the switch turns the servo another 60 degrees to get to 120
     - after setting down the cookie, the drink LED lights up again
-  
-  */
-
- if(digitalRead(cookiePin) == HIGH) {
-    
-    // alice turns to the 90 degree angle
-    aliceServo.write(90);
-    //
-    digitalWrite(drinkLED, HIGH);
-    
-    // other LEDs turn off to signify that it's not time to use them
-    digitalWrite(cookieLED, LOW);
+   
+   */
+   
+    // servo turns 60 degrees
+    aliceServo.write(60);
+    // cookie LED lights up to signify next step
+    digitalWrite(cookieLED, HIGH);
+    digitalWrite(drinkLED, LOW);
     digitalWrite(aliceLED, LOW);
 
-    } 
-    
-    else {
-    
-      aliceServo.write(45);
-    
-    }
-
-
 /*
-    
     2ND DRINK SWITCH
     - after the cookie switch is used, the LED for the drink is lit up again to signify that it's time to use it a second time
     - the cookie has been set down, so the servo is at 135 degrees
     - when the cookie is placed down, the switch turns the servo another 45 degrees to get to 90
    
 */
-
-  if(digitalRead(drinkPin2) == HIGH) {
-    
-    aliceServo.write(180);
-     digitalWrite(aliceLED, HIGH);
-
-    // other LEDs turn off to signify that it's not time to use them
-    digitalWrite(drinkLED, LOW);
-    digitalWrite(cookieLED, LOW);
    
+    // checking to see if the 1st drink AND cookie have been used
+    if ((drinkValue_1 == HIGH && cookieValue  == HIGH)) {
+    // servo turns to 120 degrees
+    aliceServo.write(120);
+    // drink LED lights up again to signify next step
+    digitalWrite(cookieLED, LOW);
+    digitalWrite(drinkLED, HIGH);
+    digitalWrite(aliceLED, LOW);
     
-    } 
-    
-    else {
-      
-      aliceServo.write(135);
-    
-    }
-  
 /*
     ALICE SWITCH
     - after the cookie switch is used, the LED for the drink is lit up again to signify that it's time to use it a second time
     - because the drink switch was already used, the servo is at 45 degrees since it's already turned once
     - when the cookie is placed down, the switch turns the servo another 45 degrees to get to 90
-
-       
+   
 */
-    
 
-  if(digitalRead(alicePin) == HIGH) {
-    
-    doorServo.write(180);
-
-    
-    // other LEDs turn off to signify they don't need to be used anymore
-    digitalWrite(drinkLED, LOW);
+ // checking to see if every switch has been completed before the Alice servo turns for the last time
+    if (drinkValue_1 == HIGH && cookieValue == HIGH && drinkValue_2 == HIGH) {
+    // servo turns to 180 degrees
+    aliceServo.write(180);
+    // Alice LED lights up again to signify next step needed to open the door
+    digitalWrite(aliceLED, HIGH);
+      if (aliceValue == HIGH) {
+          doorServo.write(90);
+    // all LEDs turn off
     digitalWrite(cookieLED, LOW);
+    digitalWrite(drinkLED, LOW);
     digitalWrite(aliceLED, LOW);
-
+        }
     } 
-    
+  }
+}
     else {
-
-  
-      
+      aliceServo.write(0);
+      doorServo.write(0); 
     }
+  
+}
