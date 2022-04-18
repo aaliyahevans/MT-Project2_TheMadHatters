@@ -27,9 +27,8 @@ const int aliceSWITCH = 7;
 const int doorPin = 11;
 const int alicePin = 12;
 
-
-const int cookieLED = 8; 
-const int drinkLED = 9;
+const int drinkLED = 8;
+const int cookieLED = 9; 
 const int aliceLED = 10;
 
 
@@ -46,7 +45,7 @@ void setup() {
   aliceServo.write(0);
   doorServo.attach(doorPin);
   doorServo.write(0);
-  
+  Serial.begin(9600);
   pinMode(drinkSWITCH_1, INPUT);
   pinMode(drinkSWITCH_2, INPUT);
   pinMode(cookieSWITCH, INPUT);
@@ -55,6 +54,8 @@ void setup() {
   pinMode(drinkLED, OUTPUT);
   pinMode(cookieLED, OUTPUT);
   pinMode(aliceLED, OUTPUT);
+
+  
   
 }
 
@@ -75,7 +76,7 @@ void loop() {
     - once the drink is set down, the cookie LED lights up to signify that's the next step
   */
   
-  if (drinkValue_1 == HIGH) {
+  if (drinkValue_1 == HIGH && cookieValue != HIGH) {
 
    /*
    
@@ -89,10 +90,13 @@ void loop() {
    
     // servo turns 60 degrees
     aliceServo.write(60);
+    Serial.println("The drink has been placed down.");
     // cookie LED lights up to signify next step
     digitalWrite(cookieLED, HIGH);
     digitalWrite(drinkLED, LOW);
     digitalWrite(aliceLED, LOW);
+
+  }
 
 /*
     2ND DRINK SWITCH
@@ -103,9 +107,10 @@ void loop() {
 */
    
     // checking to see if the 1st drink AND cookie have been used
-    if ((drinkValue_1 == HIGH && cookieValue  == HIGH)) {
+    if ((drinkValue_1 == HIGH && cookieValue  == HIGH && drinkValue_2 != HIGH)) {
     // servo turns to 120 degrees
     aliceServo.write(120);
+    Serial.println("Both the drink and cookie have been used.");
     // drink LED lights up again to signify next step
     digitalWrite(cookieLED, LOW);
     digitalWrite(drinkLED, HIGH);
@@ -118,6 +123,7 @@ void loop() {
     - when the cookie is placed down, the switch turns the servo another 45 degrees to get to 90
    
 */
+    }
 
  // checking to see if every switch has been completed before the Alice servo turns for the last time
     if (drinkValue_1 == HIGH && cookieValue == HIGH && drinkValue_2 == HIGH) {
@@ -133,11 +139,14 @@ void loop() {
     digitalWrite(aliceLED, LOW);
         }
     } 
-  }
-}
+  
+
     else {
       aliceServo.write(0);
       doorServo.write(0); 
+
+      digitalWrite(drinkLED, HIGH);
+      digitalWrite(cookieLED, LOW);
     }
-  
+
 }
